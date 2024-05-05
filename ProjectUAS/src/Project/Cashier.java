@@ -1,0 +1,695 @@
+package Project;
+
+import java.sql.*;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+public class Cashier extends javax.swing.JFrame {
+
+    // Deklarasi variabel
+    public Statement st; // Objek Statement untuk mengirim pernyataan SQL ke database
+    public ResultSet rs; // Objek ResultSet untuk menyimpan hasil query dari database
+    Connection Konektor = Koneksi.KonektorDB.BukaKoneksi(); // Objek Connection untuk menjaga koneksi dengan database
+    String kodeBarang = ""; // Variabel untuk menyimpan kode barang yang digunakan dalam operasi
+    int hargaBarang = 0; // Variabel untuk menyimpan harga barang berdasarkan kode barang
+    int subTotal = 0; // Variabel untuk menyimpan subtotal dari jumlah barang yang dihitung
+
+    public Cashier() {
+        initComponents(); // Inisialisasi komponen GUI
+        TampilData(); // Menampilkan data pada tabel
+        txtID.setVisible(false); // Mengatur visibilitas komponen txtID menjadi false (tidak terlihat)
+        bBatal.setVisible(false); // Mengatur visibilitas komponen bBatal menjadi false (tidak terlihat)
+        bEdit.setEnabled(false); // Mengatur komponen bEdit menjadi non-aktif (tidak dapat diklik)
+        bHapus.setEnabled(false); // Mengatur komponen bHapus menjadi non-aktif (tidak dapat diklik)
+        labelTotalBayar.setVisible(false); // Mengatur visibilitas komponen labelTotalBayar menjadi false (tidak terlihat)
+        labelRupiah.setVisible(false); // Mengatur visibilitas komponen labelRupiah menjadi false (tidak terlihat)
+        labelBayaran.setVisible(false); // Mengatur visibilitas komponen labelBayaran menjadi false (tidak terlihat)
+    }
+
+    //Membuka Dashoard Database
+    private void openDatabaseForm() {
+        // Membuat objek instance dari form Database
+        Database databaseForm = new Database();
+        // Menampilkan form Database
+        databaseForm.setVisible(true);
+    }
+
+    //Membersihkan Isi Input
+    private void Clear() {
+        txtNama.setText("");
+        txtKode.setText("");
+        txtJumlahBarang.setText("");
+        txtJumlahUang.setText("");
+    }
+
+    //Mencari Harga sesuai dengan Kode Produk
+    private boolean kodeProduk() {
+        try {
+            // Mengambil data setiap Kode dari db_produk
+            String cariKodeHarga = "SELECT Harga, Stok FROM db_produk WHERE Kode = ?";
+            PreparedStatement statement = Konektor.prepareStatement(cariKodeHarga);
+            statement.setString(1, kodeBarang); // Kode akan disimpan kedalam kodeBarang
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                // Jika Kode ditemukan dan sesuai dengan database dalam db_produk maka akan mengambil harga dan stok dari kode yang dimasukkan
+                hargaBarang = resultSet.getInt("Harga");
+                int stokBarang = resultSet.getInt("Stok");
+
+                // Menghitung subtotal
+                int jumlahBarang = Integer.parseInt(txtJumlahBarang.getText());
+
+                if (jumlahBarang > stokBarang) {
+                    // Jika jumlah yang dibeli melebihi stok yang tersedia, tampilkan pesan "stock limited"
+                    JOptionPane.showMessageDialog(null, "Stock terbatas!");
+                    return false;
+                }
+
+                subTotal = jumlahBarang * hargaBarang;
+            } else {
+                // Jika Kode tidak ditemukan dalam db_produk
+                JOptionPane.showMessageDialog(null, "Kode barang tidak ditemukan!");
+                return false;
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+            return false;
+        }
+        return true;
+    }
+
+    //Untuk menampilkan Isi data pada produk ke Dalam Tabel
+    private void TampilData() {
+        try {
+
+            st = Konektor.createStatement();
+            rs = st.executeQuery("SELECT * FROM produk");
+
+            DefaultTableModel model = new DefaultTableModel();
+            model.addColumn("ID");
+            model.addColumn("Kode");
+            model.addColumn("Nama");
+            model.addColumn("Harga");
+            model.addColumn("Jumlah");
+            model.addColumn("Total");
+
+            model.getDataVector().removeAllElements();
+            model.setRowCount(0);
+
+            while (rs.next()) {
+                Object[] data = {
+                    rs.getString("ID"),
+                    rs.getString("Kode"),
+                    rs.getString("Nama"),
+                    rs.getString("Harga"),
+                    rs.getString("Jumlah"),
+                    rs.getString("Total")
+                };
+                model.addRow(data);
+                tabelData.setModel(model);
+            }
+
+        } catch (Exception e) {
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel4 = new javax.swing.JPanel();
+        PanelUtama = new javax.swing.JPanel();
+        labelNama = new javax.swing.JLabel();
+        txtNama = new javax.swing.JTextField();
+        labelKode = new javax.swing.JLabel();
+        txtKode = new javax.swing.JTextField();
+        labelJumlahBarang = new javax.swing.JLabel();
+        txtJumlahBarang = new javax.swing.JTextField();
+        Pembatas1 = new javax.swing.JPanel();
+        labelJumlahUang = new javax.swing.JLabel();
+        txtJumlahUang = new javax.swing.JTextField();
+        bBersih = new javax.swing.JButton();
+        bTotal = new javax.swing.JButton();
+        bBayar = new javax.swing.JButton();
+        txtID = new javax.swing.JTextField();
+        PanelTotalHarga = new javax.swing.JPanel();
+        PanelSubTotalHarga = new javax.swing.JPanel();
+        labelTotalBayar = new javax.swing.JLabel();
+        labelBayaran = new javax.swing.JLabel();
+        labelRupiah = new javax.swing.JLabel();
+        Pembatas2 = new javax.swing.JPanel();
+        jTable = new javax.swing.JScrollPane();
+        tabelData = new javax.swing.JTable();
+        bTambah = new javax.swing.JButton();
+        bEdit = new javax.swing.JButton();
+        bBatal = new javax.swing.JButton();
+        bHapus = new javax.swing.JButton();
+        bDashboard = new javax.swing.JButton();
+
+        jPanel4.setBackground(new java.awt.Color(204, 204, 204));
+        jPanel4.setLayout(null);
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        PanelUtama.setBackground(new java.awt.Color(255, 255, 255));
+        PanelUtama.setPreferredSize(new java.awt.Dimension(950, 460));
+        PanelUtama.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        labelNama.setFont(new java.awt.Font("Poppins SemiBold", 0, 15)); // NOI18N
+        labelNama.setText("Nama Barang");
+        PanelUtama.add(labelNama, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, -1, -1));
+        PanelUtama.add(txtNama, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 40, 150, -1));
+
+        labelKode.setFont(new java.awt.Font("Poppins SemiBold", 0, 15)); // NOI18N
+        labelKode.setText("Kode Barang");
+        PanelUtama.add(labelKode, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, -1, -1));
+        PanelUtama.add(txtKode, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 80, 150, -1));
+
+        labelJumlahBarang.setFont(new java.awt.Font("Poppins SemiBold", 0, 15)); // NOI18N
+        labelJumlahBarang.setText("Jumlah Barang");
+        PanelUtama.add(labelJumlahBarang, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 120, -1, -1));
+        PanelUtama.add(txtJumlahBarang, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 120, 150, -1));
+
+        Pembatas1.setBackground(new java.awt.Color(204, 204, 204));
+        Pembatas1.setLayout(null);
+        PanelUtama.add(Pembatas1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, 318, 3));
+
+        labelJumlahUang.setFont(new java.awt.Font("Poppins SemiBold", 0, 15)); // NOI18N
+        labelJumlahUang.setText("Jumlah Uang");
+        PanelUtama.add(labelJumlahUang, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 190, -1, -1));
+        PanelUtama.add(txtJumlahUang, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 190, 150, -1));
+
+        bBersih.setBackground(new java.awt.Color(255, 255, 255));
+        bBersih.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
+        bBersih.setText("Bersihkan");
+        bBersih.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bBersihActionPerformed(evt);
+            }
+        });
+        PanelUtama.add(bBersih, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 240, 150, 30));
+
+        bTotal.setBackground(new java.awt.Color(255, 255, 255));
+        bTotal.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
+        bTotal.setText("Totalkan");
+        bTotal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bTotalActionPerformed(evt);
+            }
+        });
+        PanelUtama.add(bTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 240, 150, 30));
+
+        bBayar.setBackground(new java.awt.Color(255, 255, 255));
+        bBayar.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
+        bBayar.setText("Bayar");
+        bBayar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bBayarActionPerformed(evt);
+            }
+        });
+        PanelUtama.add(bBayar, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 280, 320, 30));
+
+        txtID.setEditable(false);
+        txtID.setForeground(new java.awt.Color(255, 255, 255));
+        txtID.setCaretColor(new java.awt.Color(255, 255, 255));
+        PanelUtama.add(txtID, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 340, 70, -1));
+
+        PanelTotalHarga.setBackground(new java.awt.Color(255, 255, 255));
+        PanelTotalHarga.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+        PanelTotalHarga.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        PanelSubTotalHarga.setBackground(new java.awt.Color(51, 204, 255));
+        PanelSubTotalHarga.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+        PanelSubTotalHarga.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        labelTotalBayar.setFont(new java.awt.Font("Poppins SemiBold", 0, 15)); // NOI18N
+        labelTotalBayar.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        labelTotalBayar.setText("Total Bayar");
+        PanelSubTotalHarga.add(labelTotalBayar, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 10, 120, -1));
+
+        PanelTotalHarga.add(PanelSubTotalHarga, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 318, 40));
+
+        labelBayaran.setFont(new java.awt.Font("Poppins SemiBold", 0, 45)); // NOI18N
+        labelBayaran.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        labelBayaran.setText("1.000.000");
+        PanelTotalHarga.add(labelBayaran, new org.netbeans.lib.awtextra.AbsoluteConstraints(48, 40, 250, 90));
+
+        labelRupiah.setFont(new java.awt.Font("Poppins SemiBold", 0, 20)); // NOI18N
+        labelRupiah.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        labelRupiah.setText("Rp");
+        PanelTotalHarga.add(labelRupiah, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 50, 50));
+
+        PanelUtama.add(PanelTotalHarga, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 330, 318, 130));
+
+        Pembatas2.setBackground(new java.awt.Color(204, 204, 204));
+        Pembatas2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        PanelUtama.add(Pembatas2, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 40, 3, 420));
+
+        tabelData.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
+        tabelData.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "ID", "Kode", "Nama", "Harga", "Jumlah", "Total"
+            }
+        ));
+        tabelData.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabelDataMouseClicked(evt);
+            }
+        });
+        jTable.setViewportView(tabelData);
+        if (tabelData.getColumnModel().getColumnCount() > 0) {
+            tabelData.getColumnModel().getColumn(0).setResizable(false);
+            tabelData.getColumnModel().getColumn(1).setResizable(false);
+            tabelData.getColumnModel().getColumn(2).setResizable(false);
+            tabelData.getColumnModel().getColumn(3).setResizable(false);
+            tabelData.getColumnModel().getColumn(4).setResizable(false);
+            tabelData.getColumnModel().getColumn(5).setResizable(false);
+        }
+
+        PanelUtama.add(jTable, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 40, 530, 330));
+
+        bTambah.setBackground(new java.awt.Color(255, 255, 255));
+        bTambah.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
+        bTambah.setText("Tambah");
+        bTambah.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bTambahActionPerformed(evt);
+            }
+        });
+        PanelUtama.add(bTambah, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 390, 90, 30));
+
+        bEdit.setBackground(new java.awt.Color(255, 255, 255));
+        bEdit.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
+        bEdit.setText("Perbarui");
+        bEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bEditActionPerformed(evt);
+            }
+        });
+        PanelUtama.add(bEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 390, 90, 30));
+
+        bBatal.setBackground(new java.awt.Color(255, 255, 255));
+        bBatal.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
+        bBatal.setText("Batal");
+        bBatal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bBatalActionPerformed(evt);
+            }
+        });
+        PanelUtama.add(bBatal, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 390, 90, 30));
+
+        bHapus.setBackground(new java.awt.Color(255, 255, 255));
+        bHapus.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
+        bHapus.setText("Hapus");
+        bHapus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bHapusActionPerformed(evt);
+            }
+        });
+        PanelUtama.add(bHapus, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 430, 320, 30));
+
+        bDashboard.setBackground(new java.awt.Color(255, 255, 255));
+        bDashboard.setFont(new java.awt.Font("Poppins Medium", 0, 12)); // NOI18N
+        bDashboard.setText("Dashboard");
+        bDashboard.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bDashboardActionPerformed(evt);
+            }
+        });
+        PanelUtama.add(bDashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 390, 120, 30));
+
+        getContentPane().add(PanelUtama, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 950, 500));
+
+        pack();
+        setLocationRelativeTo(null);
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void bTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bTambahActionPerformed
+        // Tombol "Tambah" ditekan
+
+        try {
+            // Jika Input Kosong maka tidak bisa melakukan Simpan data
+            if (txtNama.getText().equals("") || txtKode.getText().equals("") || txtJumlahBarang.getText().equals("")) {
+                JOptionPane.showMessageDialog(null, "Input tidak boleh kosong!", "Validasi Input", JOptionPane.ERROR_MESSAGE);
+                return;
+            } else {
+                // Simpan Data
+                if (bTambah.getText().equals("Tambah")) {
+
+                    // Periksa apakah kode barang ada dalam tabel db_produk
+                    String checkQuery = "SELECT Harga FROM db_produk WHERE LOWER(Kode) = LOWER(?)";
+                    PreparedStatement checkStatement = Konektor.prepareStatement(checkQuery);
+                    checkStatement.setString(1, txtKode.getText());
+                    ResultSet checkResultSet = checkStatement.executeQuery();
+
+                    if (checkResultSet.next()) {
+                        // Kode barang ditemukan, lanjutkan dengan penyimpanan data
+                        String sql = "INSERT INTO produk (Kode, Nama, Harga, Jumlah, Total) VALUES (?, ?, ?, ?, ?)";
+
+                        try (PreparedStatement statement = Konektor.prepareStatement(sql)) {
+                            // Sisanya tetap seperti sebelumnya
+                            kodeBarang = txtKode.getText();
+                            boolean stockAvailable = kodeProduk();
+
+                            if (stockAvailable) {
+                                statement.setString(1, kodeBarang);
+                                statement.setString(2, txtNama.getText());
+                                statement.setInt(3, hargaBarang);
+                                statement.setString(4, txtJumlahBarang.getText());
+                                statement.setInt(5, subTotal);
+
+                                statement.executeUpdate();
+                                Clear();
+                                TampilData();
+                            }
+                        } catch (Exception e) {
+                            JOptionPane.showMessageDialog(null, e);
+                        }
+                    } else {
+                        // Kode barang tidak ditemukan dalam db_produk
+                        JOptionPane.showMessageDialog(null, "Kode barang tidak ditemukan!");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }//GEN-LAST:event_bTambahActionPerformed
+
+    private void tabelDataMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelDataMouseClicked
+        // Tabel data di-klik
+
+        txtNama.setText(tabelData.getValueAt(tabelData.getSelectedRow(), 2).toString());
+        txtKode.setText(tabelData.getValueAt(tabelData.getSelectedRow(), 1).toString());
+        txtJumlahBarang.setText(tabelData.getValueAt(tabelData.getSelectedRow(), 4).toString());
+        txtID.setText(tabelData.getValueAt(tabelData.getSelectedRow(), 0).toString());
+
+        bEdit.setEnabled(true);
+        bHapus.setEnabled(true);
+        bTambah.setEnabled(false);
+        bBatal.setVisible(true);
+    }//GEN-LAST:event_tabelDataMouseClicked
+
+    private void bHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bHapusActionPerformed
+        // Tombol "Hapus" ditekan
+
+        //Konfirmasi hapus Data
+        int Jawab = JOptionPane.showConfirmDialog(null, "Data ini akan dihapus, lanjutkan?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+        if (Jawab == 0) { //0 == Yes, 1 ==No
+            try {
+                st = Konektor.createStatement();
+
+                //Mencari ID produk yang akan dihapus
+                String hapus = "DELETE FROM produk WHERE ID = '" + txtID.getText() + "'";
+                st.executeUpdate(hapus);
+                //Jika data Berhasil dihapus
+                JOptionPane.showMessageDialog(null, "Data Berhasil Dihapus!");
+                tabelData.clearSelection();
+                Clear();
+                TampilData();
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
+    }//GEN-LAST:event_bHapusActionPerformed
+
+    private void bEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bEditActionPerformed
+        // TODO add your handling code here:
+        try {
+    String cekUpdate = "SELECT COUNT(*) FROM produk WHERE Nama = ? AND Kode = ? AND Jumlah = ?";
+
+    try (PreparedStatement cekStatement = Konektor.prepareStatement(cekUpdate)) {
+        cekStatement.setString(1, txtNama.getText());
+        cekStatement.setString(2, txtKode.getText());
+        cekStatement.setString(3, txtJumlahBarang.getText());
+        ResultSet cekResult = cekStatement.executeQuery();
+        cekResult.next();
+        int count = cekResult.getInt(1);
+
+        if (count > 0) {
+            JOptionPane.showMessageDialog(null, "Data masih sama!", "", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    }
+
+    if (txtNama.getText().equals("") || txtKode.getText().equals("") || txtJumlahBarang.getText().equals("")) {
+        JOptionPane.showMessageDialog(null, "Input tidak boleh kosong!", "Validasi Input", JOptionPane.ERROR_MESSAGE);
+        return;
+    } else {
+        kodeBarang = txtKode.getText();
+        boolean stockAvailable = kodeProduk();
+
+        if (stockAvailable) {
+            String update = "UPDATE produk SET Nama = ?, Jumlah = ?, Total = ? WHERE ID = ?";
+
+            try (PreparedStatement statement = Konektor.prepareStatement(update)) {
+                statement.setString(1, txtNama.getText());
+                statement.setString(2, txtJumlahBarang.getText());
+                statement.setInt(3, subTotal);
+                statement.setString(4, txtID.getText());
+
+                statement.executeUpdate();
+                Clear();
+                JOptionPane.showMessageDialog(null, "Data berhasil diperbarui!");
+                TampilData();
+            }
+        }
+    }
+} catch (Exception e) {
+    JOptionPane.showMessageDialog(null, e);
+}
+
+    }//GEN-LAST:event_bEditActionPerformed
+
+    private void bBatalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bBatalActionPerformed
+        // Jika klik tombol batal maka beberapa Butotn akan Disable
+        tabelData.clearSelection();
+        Clear();
+        bEdit.setEnabled(false);
+        bHapus.setEnabled(false);
+        bBatal.setVisible(false);
+        bTambah.setEnabled(true);
+        TampilData();
+    }//GEN-LAST:event_bBatalActionPerformed
+
+    private void bTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bTotalActionPerformed
+
+        try {
+            // Mengambil total nilai dari kolom 'Total' pada tabel 'produk'
+            String sql = "SELECT Total FROM produk";
+            st = Konektor.createStatement();
+            rs = st.executeQuery(sql);
+
+            int totalSemua = 0;
+
+            // Mengiterasi setiap baris hasil query
+            while (rs.next()) {
+                int nilai = rs.getInt(1);
+                totalSemua += nilai;
+            }
+
+            // Memeriksa apakah tabel kosong
+            if (totalSemua == 0) {
+                // Menampilkan pesan jika tabel kosong
+                JOptionPane.showMessageDialog(null, "Tabel kosong!");
+            } else {
+                // Menampilkan total nilai pada label dan mengatur tampilan label
+                labelBayaran.setText(Integer.toString(totalSemua));
+                labelTotalBayar.setVisible(true);
+                labelRupiah.setVisible(true);
+                labelBayaran.setVisible(true);
+                Clear();
+            }
+        } catch (Exception e) {
+            // Menangani kesalahan yang terjadi, tetapi tidak ada tindakan lebih lanjut
+        }
+    }//GEN-LAST:event_bTotalActionPerformed
+
+    private void bBayarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bBayarActionPerformed
+
+        try {
+            String kodeBarang = ""; // Deklarasi variabel kodeBarang di luar loop while
+
+            // Dapatkan informasi jumlah beli dan kode barang dari tabel pembelian
+            String ambilsetiapstok = "SELECT Kode, Jumlah FROM produk";
+            PreparedStatement statement = Konektor.prepareStatement(ambilsetiapstok);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                kodeBarang = resultSet.getString("Kode");
+                int jumlahBeli = resultSet.getInt("Jumlah");
+
+                // Dapatkan jumlah stok barang sebelum pembayaran
+                String query = "SELECT Stok FROM db_produk WHERE Kode = ?";
+                PreparedStatement stokStatement = Konektor.prepareStatement(query);
+                stokStatement.setString(1, kodeBarang);
+                ResultSet stokResultSet = stokStatement.executeQuery();
+
+                if (stokResultSet.next()) {
+                    int stokBarang = stokResultSet.getInt("Stok");
+                    if (stokBarang >= jumlahBeli) {
+                        // Kurangi jumlah stok dengan jumlah barang yang akan dibeli
+                        int stokBaru = stokBarang - jumlahBeli;
+
+                        // Perbarui nilai stok barang dalam database
+                        String updateQuery = "UPDATE db_produk SET Stok = ? WHERE Kode = ?";
+                        PreparedStatement updateStatement = Konektor.prepareStatement(updateQuery);
+                        updateStatement.setInt(1, stokBaru);
+                        updateStatement.setString(2, kodeBarang);
+                        updateStatement.executeUpdate();
+                    } else {
+                        // Jumlah stok tidak mencukupi, berikan tindakan yang sesuai
+                        JOptionPane.showMessageDialog(null, "Jumlah stok barang tidak mencukupi untuk kode barang!");
+                    }
+                } else {
+                    // Kode barang tidak ditemukan, berikan tindakan yang sesuai
+                    JOptionPane.showMessageDialog(null, "Kode barang tidak ditemukan!");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Tangani kesalahan yang terjadi saat mengurangi stok barang
+        }
+
+        String jumlahUang = txtJumlahUang.getText();
+
+        int Kembalian = 0;
+
+        try {
+            String sql = "SELECT Total FROM produk";
+            st = Konektor.createStatement();
+            rs = st.executeQuery(sql);
+
+            int totalSemua = 0;
+
+            while (rs.next()) {
+                int nilai = rs.getInt(1);
+                totalSemua += nilai;
+            }
+
+            if (jumlahUang.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Jumlah uang belum di Masukkan!");
+            } else if (totalSemua == 0) {
+                JOptionPane.showMessageDialog(null, "Tabel Kosong/Belum di Totalkan!");
+            } else {
+                txtJumlahUang.setText("");
+                labelTotalBayar.setText("Kembalian");
+                Kembalian = Integer.parseInt(jumlahUang) - totalSemua;
+                labelBayaran.setText(Integer.toString(Kembalian));
+            }
+        } catch (Exception e) {
+            // Tangani kesalahan yang terjadi saat menghitung kembalian
+        }
+
+    }//GEN-LAST:event_bBayarActionPerformed
+
+    private void bBersihActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bBersihActionPerformed
+        Clear();
+
+        try {
+            st = Konektor.createStatement();
+
+            String hapus = "DELETE FROM produk";
+            st.executeUpdate(hapus);
+
+            // Mengatur ulang label dan komponen lainnya
+            labelTotalBayar.setText("");
+            labelRupiah.setText("");
+            labelBayaran.setText("");
+            Clear();
+
+            JOptionPane.showMessageDialog(null, "Terimakasih telah Berbelanja!");
+
+            // Memperbarui tampilan tabel
+            TampilData();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }//GEN-LAST:event_bBersihActionPerformed
+
+    private void bDashboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bDashboardActionPerformed
+        //Membuka Database.java
+        openDatabaseForm();
+        this.setVisible(false); //Membuat tampilan Cashier.java menjadi tidak Terlihat
+    }//GEN-LAST:event_bDashboardActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Cashier.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Cashier.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Cashier.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Cashier.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Cashier().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel PanelSubTotalHarga;
+    private javax.swing.JPanel PanelTotalHarga;
+    private javax.swing.JPanel PanelUtama;
+    private javax.swing.JPanel Pembatas1;
+    private javax.swing.JPanel Pembatas2;
+    private javax.swing.JButton bBatal;
+    private javax.swing.JButton bBayar;
+    private javax.swing.JButton bBersih;
+    private javax.swing.JButton bDashboard;
+    private javax.swing.JButton bEdit;
+    private javax.swing.JButton bHapus;
+    private javax.swing.JButton bTambah;
+    private javax.swing.JButton bTotal;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JScrollPane jTable;
+    private javax.swing.JLabel labelBayaran;
+    private javax.swing.JLabel labelJumlahBarang;
+    private javax.swing.JLabel labelJumlahUang;
+    private javax.swing.JLabel labelKode;
+    private javax.swing.JLabel labelNama;
+    private javax.swing.JLabel labelRupiah;
+    private javax.swing.JLabel labelTotalBayar;
+    private javax.swing.JTable tabelData;
+    private javax.swing.JTextField txtID;
+    private javax.swing.JTextField txtJumlahBarang;
+    private javax.swing.JTextField txtJumlahUang;
+    private javax.swing.JTextField txtKode;
+    private javax.swing.JTextField txtNama;
+    // End of variables declaration//GEN-END:variables
+}
