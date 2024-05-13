@@ -1,4 +1,3 @@
-![Presentasi PBO Kelompok 2_page-0009](https://github.com/muhhlmy/final-project-semester-2/assets/120382858/7d010ce5-b6bf-4768-9b9b-cfec26adab97)
 # Program Apotek Sederhana
 
  Dalam sebuah bisnis, manajemen produk sangatlah penting untuk
